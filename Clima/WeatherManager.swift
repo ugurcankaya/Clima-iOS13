@@ -4,7 +4,7 @@ struct WeatherManager{
     
     var weatherURL:String?
     mutating func fetchWeather(cityName: String){
-        self.weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=\(cityName)&appid=45e422329edc89219feb731651bb6a40&unit=metrics"
+        self.weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=\(cityName)&appid=45e422329edc89219feb731651bb6a40&units=metric"
         
         performRequest(weatherURL: self.weatherURL!)
     }
@@ -22,8 +22,7 @@ struct WeatherManager{
                     return
                 }
                 if let safeData = data {
-                    let dataString = String(data: safeData, encoding: .utf8)
-                    print(dataString!)
+                    self.parseJSON(weatherData: safeData)
                 }
             }
             //4.Start The Task
@@ -32,6 +31,14 @@ struct WeatherManager{
         }
     }
     
-    
+    func parseJSON(weatherData: Data){
+        let decoder = JSONDecoder()
+        do{
+          let decodedData =   try decoder.decode(WeatherData.self, from: weatherData)
+            print(decodedData.weather[0].description)
+        }catch {
+            print(error)
+        }
+    }
     
 }
