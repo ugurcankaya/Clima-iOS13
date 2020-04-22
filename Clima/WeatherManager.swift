@@ -1,15 +1,20 @@
 import Foundation
-
+protocol WeatherManagerDelegate{
+    func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
+    func didFailWithError(error: Error)
+}
 struct WeatherManager{
     
     var weatherURL:String?
+    var delegate:WeatherManagerDelegate?
     mutating func fetchWeather(cityName: String){
         self.weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=\(cityName)&appid=45e422329edc89219feb731651bb6a40&units=metric"
         
-        performRequest(weatherURL: self.weatherURL!)
+        performRequest(with: self.weatherURL!)
     }
     
-    func performRequest(weatherURL: String){
+    
+    func performRequest(with weatherURL: String){
         //1. Create URL
         if let url = URL(string: self.weatherURL!){
             //2.URL Session
@@ -18,11 +23,15 @@ struct WeatherManager{
             let task = session.dataTask(with: url) {
                 (data, response, error) in
                 if error != nil{
+                    
                     print(error!)
+                    self.delegate?.didFailWithError(error: error!)
                     return
                 }
                 if let safeData = data {
-                    self.parseJSON(weatherData: safeData)
+                    if let weather =  self.parseJSON(safeData){
+                        self.delegate?.didUpdateWeather(self,weather: weather)
+                    }
                 }
             }
             //4.Start The Task
@@ -31,7 +40,7 @@ struct WeatherManager{
         }
     }
     
-    func parseJSON(weatherData: Data){
+    func parseJSON(_ weatherData: Data) -> WeatherModel?{
         let decoder = JSONDecoder()
         do{
             let decodedData =   try decoder.decode(WeatherData.self, from: weatherData)
@@ -41,9 +50,11 @@ struct WeatherManager{
             
             
             let weather:WeatherModel = WeatherModel(conditionID: id, cityName: name, temperature: Double(temp))
-            print(weather.tempString)
+            return weather
         }catch {
             print(error)
+            delegate?.didFailWithError(error: error)
+            return nil
         }
     }
     
