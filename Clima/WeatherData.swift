@@ -9,6 +9,6 @@ struct Main:Decodable{
     let temp:Float
 }
 struct Weather:Decodable{
-    let description:String
+    let id:Int
 }
 
