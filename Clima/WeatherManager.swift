@@ -1,22 +1,29 @@
 import Foundation
+import CoreLocation
 protocol WeatherManagerDelegate{
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
     func didFailWithError(error: Error)
 }
-struct WeatherManager{
+class WeatherManager{
     
-    var weatherURL:String?
-    var delegate:WeatherManagerDelegate?
-    mutating func fetchWeather(cityName: String){
+     var weatherURL:String?
+      var delegate:WeatherManagerDelegate?
+       func fetchWeather(cityName: String){
         self.weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=\(cityName)&appid=45e422329edc89219feb731651bb6a40&units=metric"
-        
-        performRequest(with: self.weatherURL!)
-    }
+          
+          performRequest(with: self.weatherURL!)
+      }
     
+      func fetchWeather(LAT:CLLocationDegrees, LONGT:CLLocationDegrees){
+        let urlString = "https://api.openweathermap.org/data/2.5/weather?appid=45e422329edc89219feb731651bb6a40&units=metric" + "&lat=\(LAT)&lon=\(LONGT)"
+         print(urlString)
+         performRequest(with: urlString)
+
+    }
     
     func performRequest(with weatherURL: String){
         //1. Create URL
-        if let url = URL(string: self.weatherURL!){
+        if let url = URL(string: weatherURL){
             //2.URL Session
             let session = URLSession(configuration: .default)
             //3.Give the session a task
