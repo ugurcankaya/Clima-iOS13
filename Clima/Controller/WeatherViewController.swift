@@ -29,6 +29,8 @@ class WeatherViewController: UIViewController {
         
     }
     @IBAction func locationPressed(_ sender: UIButton) {
+        cityLabel.text = "Loading..."
+
         locationManager.requestLocation()
     }
     
@@ -69,6 +71,7 @@ extension WeatherViewController:UITextFieldDelegate{
 //MARK: - WeatherManagerDelegate
 extension WeatherViewController:WeatherManagerDelegate{
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
+         cityLabel.text = "Loading..."
            print(weather.cityName)
            print(weather.tempString)
            print(weather.conditionName)
@@ -90,9 +93,11 @@ extension WeatherViewController:WeatherManagerDelegate{
 
 //MARK: - CLLocationManagerDelegate
 extension WeatherViewController:CLLocationManagerDelegate{
-    
+
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        cityLabel.text = "Loading..."
+
         if let location = locations.last{
             locationManager.stopUpdatingLocation()
             let lat = location.coordinate.latitude
